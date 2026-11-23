@@ -1,0 +1,423 @@
+{
+  "schema_version": "1",
+  "review_id": "FICTIONAL-FOUNDER-DEMO",
+  "title": "Home water controller — fictional founder disclosure",
+  "as_of": "2026-11-23",
+  "input_summary": "Fictional example: I want a home water controller that watches how long water flows without stopping. When I mark the home as away and water keeps flowing beyond a set time, it notifies me and closes a motorized main-water valve. I want to limit water damage while nobody is home. I have not built it, chosen the timer rule, or decided what happens if a sensor or the power fails.",
+  "executive_summary": [
+    {
+      "text": "The proposed device watches continuous water flow while a home is marked as away. After a selected duration, it would notify the homeowner and close the main-water valve. The intended benefit is limiting damage when nobody is present; no prototype or results were supplied.",
+      "basis": "inventor_stated",
+      "evidence": [
+        {
+          "source_id": "S-001",
+          "locator": "Fictional description, paragraph 1"
+        }
+      ]
+    },
+    {
+      "text": "The AI sees a possible core combination: an away-state condition, a continuous-flow duration rule, and a valve response. The founder should confirm whether their interaction is the intended technical focus.",
+      "basis": "ai_inferred",
+      "evidence": [
+        {
+          "source_id": "S-001",
+          "locator": "Fictional description, paragraph 1"
+        }
+      ],
+      "inference_reason": "These three disclosed steps determine when the system acts; the actual detection and failure-handling logic remains unknown."
+    },
+    {
+      "text": "Public examples show that water monitoring and automatic shutoff already appear in commercial product descriptions. The practical next step is to specify the actual decision rule and handling of normal use, false alarms, and failures. This is a development question, not a conclusion about patentability.",
+      "basis": "externally_supported",
+      "evidence": [
+        {
+          "source_id": "S-002",
+          "locator": "Automatic Water Shut Off; Internal Leak Sensor"
+        },
+        {
+          "source_id": "S-003",
+          "locator": "Product Overview; How it Works"
+        }
+      ]
+    }
+  ],
+  "problem": [
+    {
+      "text": "A homeowner may not be present to respond when water continues flowing unexpectedly.",
+      "basis": "inventor_stated",
+      "evidence": [
+        {
+          "source_id": "S-001",
+          "locator": "Fictional description, paragraph 1"
+        }
+      ]
+    },
+    {
+      "text": "It is unknown how often this problem occurs in the intended homes or which existing workaround the founder currently uses.",
+      "basis": "unknown",
+      "evidence": []
+    }
+  ],
+  "solution": [
+    {
+      "text": "Measure continuous flow duration, check whether the home is marked away, notify the homeowner, and close a motorized main-water valve when the duration exceeds a selected setting.",
+      "basis": "inventor_stated",
+      "evidence": [
+        {
+          "source_id": "S-001",
+          "locator": "Fictional description, paragraph 1"
+        }
+      ]
+    },
+    {
+      "text": "Sensor choice, timer reset behavior, notification timing, and power-failure behavior are not yet specified.",
+      "basis": "unknown",
+      "evidence": []
+    }
+  ],
+  "advantages": [
+    {
+      "text": "Intended advantage: limit water damage while nobody is home. No measured reduction has been demonstrated.",
+      "basis": "inventor_stated",
+      "evidence": [
+        {
+          "source_id": "S-001",
+          "locator": "Fictional description, paragraph 1"
+        }
+      ],
+      "evidence_needed": "Compare detected events, water released before closure, false shutoffs, and response time against a defined baseline."
+    },
+    {
+      "text": "An away-state condition might allow a different response policy than when the home is occupied.",
+      "basis": "ai_inferred",
+      "evidence": [
+        {
+          "source_id": "S-001",
+          "locator": "Fictional description, paragraph 1"
+        }
+      ],
+      "inference_reason": "The description gates action on a user-selected away state, but supplies no comparison showing a benefit.",
+      "evidence_needed": "Explain and test what changes between home and away states; measure missed events and nuisance shutoffs."
+    }
+  ],
+  "core_concepts": [
+    {
+      "id": "C-001",
+      "name": "Continuous-flow duration rule",
+      "plain_english": "Track a stretch of uninterrupted water flow and compare its length with a selected limit.",
+      "role_in_solution": "Supplies the event that may trigger action.",
+      "why_core": "The duration condition directly determines the trigger.",
+      "basis": "ai_inferred",
+      "evidence": [
+        {
+          "source_id": "S-001",
+          "locator": "Fictional description, paragraph 1"
+        }
+      ],
+      "assessment": {
+        "level": "high",
+        "reason": "Directly tied to steps in the fictional description; core status remains an AI interpretation.",
+        "missing_or_uncertain": "Measurement, reset behavior, and threshold selection are unspecified."
+      },
+      "founder_confirmation_needed": true
+    },
+    {
+      "id": "C-002",
+      "name": "Away-state gate",
+      "plain_english": "Act on the duration condition only when the home is marked away.",
+      "role_in_solution": "Changes whether the flow condition leads to the response.",
+      "why_core": "The description combines household state with water-flow information.",
+      "basis": "ai_inferred",
+      "evidence": [
+        {
+          "source_id": "S-001",
+          "locator": "Fictional description, paragraph 1"
+        }
+      ],
+      "assessment": {
+        "level": "high",
+        "reason": "Directly tied to steps in the fictional description; core status remains an AI interpretation.",
+        "missing_or_uncertain": "State selection, transitions, overrides, and occupied-home behavior are unspecified."
+      },
+      "founder_confirmation_needed": true
+    },
+    {
+      "id": "C-003",
+      "name": "Notification and valve response",
+      "plain_english": "Send a message and command the main-water valve to close.",
+      "role_in_solution": "Turns a detected condition into a physical response.",
+      "why_core": "The stated benefit depends on acting rather than merely observing.",
+      "basis": "ai_inferred",
+      "evidence": [
+        {
+          "source_id": "S-001",
+          "locator": "Fictional description, paragraph 1"
+        }
+      ],
+      "assessment": {
+        "level": "high",
+        "reason": "Directly tied to steps in the fictional description; core status remains an AI interpretation.",
+        "missing_or_uncertain": "Timing, confirmation of closure, recovery, and failure handling are unspecified."
+      },
+      "founder_confirmation_needed": true
+    }
+  ],
+  "related_concepts": [
+    {
+      "id": "R-001",
+      "name": "Pattern-based water monitoring",
+      "concept_ids": [
+        "C-001",
+        "C-002"
+      ],
+      "shared_idea": "Both use water behavior to decide when intervention may be useful.",
+      "important_differences": "The fictional proposal mentions a duration and away-state rule. The inspected Moen page describes usage-pattern analysis; whether it also uses comparable rules is unknown.",
+      "difference_status": "ai_inferred",
+      "differentiation_questions": [
+        "What exact input and state transitions does your rule use?",
+        "What happens in your design that a usage-pattern detector would handle differently, and what evidence shows the difference?"
+      ],
+      "evidence": [
+        {
+          "source_id": "S-001",
+          "locator": "Fictional description, paragraph 1"
+        },
+        {
+          "source_id": "S-002",
+          "locator": "AI Learning; Internal Leak Sensor"
+        }
+      ],
+      "assessment": {
+        "level": "medium",
+        "reason": "A narrow comparison follows from the description and inspected source passages.",
+        "missing_or_uncertain": "No complete implementation comparison or legal significance established."
+      }
+    },
+    {
+      "id": "R-002",
+      "name": "Point leak sensors linked to a shutoff valve",
+      "concept_ids": [
+        "C-001",
+        "C-003"
+      ],
+      "shared_idea": "Both connect a detection event to closing the water supply.",
+      "important_differences": "A sensor cable detects water at its location; the fictional input describes observing flow duration. This distinction does not establish novelty or absence of combined implementations.",
+      "difference_status": "ai_inferred",
+      "differentiation_questions": [
+        "Where is the event measured: in the pipe, on a floor, or both?",
+        "What event can your actual implementation detect or reject that a point sensor cannot, and how would you test that?"
+      ],
+      "evidence": [
+        {
+          "source_id": "S-001",
+          "locator": "Fictional description, paragraph 1"
+        },
+        {
+          "source_id": "S-003",
+          "locator": "Product Overview; How it Works"
+        }
+      ],
+      "assessment": {
+        "level": "medium",
+        "reason": "A narrow comparison follows from the description and inspected source passages.",
+        "missing_or_uncertain": "No complete implementation comparison or legal significance established."
+      }
+    },
+    {
+      "id": "R-003",
+      "name": "Remote valve control and alerts",
+      "concept_ids": [
+        "C-002",
+        "C-003"
+      ],
+      "shared_idea": "Both involve communication about water conditions and a controllable valve.",
+      "important_differences": "The fictional proposal links action to its duration/away rule. The reviewed public pages do not establish whether that rule is present or absent.",
+      "difference_status": "ai_inferred",
+      "differentiation_questions": [
+        "Is approval required before shutoff, or is it automatic?",
+        "What continues locally if the network is unavailable?"
+      ],
+      "evidence": [
+        {
+          "source_id": "S-001",
+          "locator": "Fictional description, paragraph 1"
+        },
+        {
+          "source_id": "S-003",
+          "locator": "How it Works"
+        }
+      ],
+      "assessment": {
+        "level": "medium",
+        "reason": "A narrow comparison follows from the description and inspected source passages.",
+        "missing_or_uncertain": "No complete implementation comparison or legal significance established."
+      }
+    }
+  ],
+  "landscape": [
+    {
+      "id": "L-001",
+      "name": "Flo Smart Water Monitor and Shutoff",
+      "entity_type": "product",
+      "organization": "Moen",
+      "concept_ids": [
+        "C-001",
+        "C-003"
+      ],
+      "what_they_do": "Moen describes monitoring water behavior, issuing alerts, and automatically closing a water valve.",
+      "connection": "Relevant to sensing and response portions of the fictional proposal.",
+      "differences_or_unknowns": "The particular duration/away-state logic is not established by this review.",
+      "source_claims_note": "Company-reported activity; not independent efficacy validation or a finding of market leadership.",
+      "availability_status": "Official page inspected; stock and geographic availability not checked.",
+      "evidence": [
+        {
+          "source_id": "S-002",
+          "locator": "Automatic Water Shut Off; Internal Leak Sensor"
+        }
+      ],
+      "assessment": {
+        "level": "high",
+        "reason": "Official source describes a technically relevant sensing or shutoff activity.",
+        "missing_or_uncertain": "Relevance does not establish identical implementation or direct competition."
+      }
+    },
+    {
+      "id": "L-002",
+      "name": "Braukmann L5 WiFi Water Leak Shutoff Valve",
+      "entity_type": "product",
+      "organization": "Resideo",
+      "concept_ids": [
+        "C-001",
+        "C-003"
+      ],
+      "what_they_do": "Resideo describes a main-supply valve responding to a sensor cable or paired leak detector, with app alerts.",
+      "connection": "An adjacent example of detection connected to physical shutoff.",
+      "differences_or_unknowns": "The historical fact sheet does not establish the complete current decision logic.",
+      "source_claims_note": "Company-reported activity; not independent efficacy validation or a finding of market leadership.",
+      "availability_status": "Historical 2022 publication; current availability not checked.",
+      "evidence": [
+        {
+          "source_id": "S-003",
+          "locator": "Product Overview; How it Works"
+        }
+      ],
+      "assessment": {
+        "level": "high",
+        "reason": "Official source describes a technically relevant sensing or shutoff activity.",
+        "missing_or_uncertain": "Relevance does not establish identical implementation or direct competition."
+      }
+    }
+  ],
+  "questions": [
+    {
+      "id": "Q-001",
+      "priority": "high",
+      "question": "Exactly what starts, pauses, and resets the continuous-flow timer?",
+      "why_it_matters": "This defines the decision mechanism and distinguishes continuous flow from intermittent normal use.",
+      "suggested_evidence": "A state diagram and three example timelines, including a brief interruption.",
+      "concept_ids": [
+        "C-001"
+      ]
+    },
+    {
+      "id": "Q-002",
+      "priority": "high",
+      "question": "What changes when the home is marked away, and how is that state selected?",
+      "why_it_matters": "The interaction between user state and the shutoff rule may be central to the proposed mechanism.",
+      "suggested_evidence": "Home/away behavior comparison and rule pseudocode.",
+      "concept_ids": [
+        "C-001",
+        "C-002"
+      ]
+    },
+    {
+      "id": "Q-003",
+      "priority": "medium",
+      "question": "What should happen during a false alarm, sensor failure, or loss of power?",
+      "why_it_matters": "The described response does not yet explain reliability or recovery.",
+      "suggested_evidence": "Failure scenarios and a prototype test plan; mark proposed behavior separately from tested behavior.",
+      "concept_ids": [
+        "C-003"
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "id": "S-001",
+      "title": "Fictional founder description",
+      "kind": "inventor",
+      "locator": "Fictional description, paragraph 1",
+      "note": "Fictional example: I want a home water controller that watches how long water flows without stopping. When I mark the home as away and water keeps flowing beyond a set time, it notifies me and closes a motorized main-water valve. I want to limit water damage while nobody is home. I have not built it, chosen the timer rule, or decided what happens if a sensor or the power fails."
+    },
+    {
+      "id": "S-002",
+      "title": "Moen Flo official product page",
+      "kind": "public",
+      "url": "https://flo.moen.com/pages/flo-smart-water-monitor",
+      "locator": "Automatic Water Shut Off; Internal Leak Sensor",
+      "inspected": true,
+      "accessed_date": "2026-11-23",
+      "publication_date": null,
+      "note": "Official company statements; performance and current inventory were not independently checked."
+    },
+    {
+      "id": "S-003",
+      "title": "Resideo water leak prevention fact sheet",
+      "kind": "public",
+      "url": "https://www.resideo.com/us/en/corporate/newsroom/fact-sheets/factsheet-water/",
+      "locator": "Product Overview; How it Works",
+      "inspected": true,
+      "accessed_date": "2026-11-23",
+      "publication_date": "2022-11-11",
+      "note": "Historical company publication. Current product specifications and availability were not checked."
+    }
+  ],
+  "research_log": [
+    {
+      "query": "Official Moen Flo product page",
+      "purpose": "Inspect a public automatic water-shutoff example",
+      "date": "2026-11-23",
+      "tool": "web open",
+      "inspected_source_ids": [
+        "S-002"
+      ],
+      "status": "completed",
+      "gaps": "No independent product test or inventory verification."
+    },
+    {
+      "query": "site.resideo.com L5 WiFi water leak shutoff valve automatic",
+      "purpose": "Find and inspect an official adjacent example",
+      "date": "2026-11-23",
+      "tool": "web search and open",
+      "inspected_source_ids": [
+        "S-003"
+      ],
+      "status": "completed",
+      "gaps": "Historical fact sheet only."
+    },
+    {
+      "query": "Official Phyn Plus product URL",
+      "purpose": "Inspect a candidate public comparison",
+      "date": "2026-11-23",
+      "tool": "web open",
+      "inspected_source_ids": [],
+      "status": "unavailable",
+      "gaps": "Page unavailable in web tool; not retained as supporting evidence."
+    }
+  ],
+  "coverage": {
+    "materials_reviewed": [
+      "Complete fictional description and two selected official public product pages."
+    ],
+    "unreadable_materials": [
+      "No prototype, drawings, measurements, patent claims, or laboratory reports were supplied."
+    ],
+    "research_status": "Limited illustrative public product orientation; not an exhaustive search.",
+    "limitations": [
+      "The founder input and invention name are fictional. Public product references are real and separate from the fictional invention.",
+      "No patent search, prosecution review, legal prior-art analysis, current inventory check, or comparative market ranking performed.",
+      "No evidence establishes that the stated rule differs from existing implementations. Missing page details do not prove a feature is absent.",
+      "Actual implementation and any technical advantage require founder confirmation and testing."
+    ]
+  }
+}
