@@ -4,6 +4,31 @@ Turn an inventor or startup founder's description into a clear **invention discl
 
 The report helps founders explain what they are building, identify the technical ideas the AI sees, and prepare a more productive conversation with patent counsel. It is **not a prior-art search** and does not determine patentability, legal coverage, infringement, or freedom to operate.
 
+## Choose a skill
+
+| Skill | Audience and format | Install folder |
+| --- | --- | --- |
+| Existing detailed disclosure skill | Full founder disclosure with core concepts, comparisons, evidence, and research records | [founder-invention-disclosure](skills/founder-invention-disclosure/SKILL.md) |
+| **Inventor Brief v2.0** | **Inventor/founder focused:** concise four-part brief with expandable detail and versioned provisional patent-strength screening | [inventor-brief-v2](skills/inventor-brief-v2/SKILL.md) |
+
+The inventor-focused v2.0 is a **separate skill**, not a replacement for the existing detailed workflow or the attorney-focused tools in Patent-Counsel-Agent. Both skills are independently installable and output Markdown, JSON, and offline HTML. Install each entire folder, including references and scripts.
+
+### Inventor Brief v2.0
+
+The default view answers four questions: **What does the AI understand? What similar ideas and innovators exist? What information would help next? What is the provisional patent-strength view?** It shows one short understanding paragraph, at most three comparison cards, and three priority requests. Evidence, confidence reasons, the six-dimension issue screen, and the full disclosure stay behind expandable controls.
+
+The patent view separates technical detail and benefit evidence from unresolved novelty, nonobviousness, and eligibility questions. It uses qualitative statuses and missing facts, not a patentability score. When new inventor data arrives, rerun the skill: retain the prior assessment and source dates, record a new revision, explain changed findings, and refresh priority requests. More detail does not automatically mean a stronger patent case. See [assessment and update guidance](skills/inventor-brief-v2/references/assessment-updates.md).
+
+> Use $inventor-brief-v2 on this invention description. Give me the concise inventor-focused brief, three priority requests, similar technologies/products/innovators with sources, and a provisional patent-strength view. Generate Markdown, JSON, and HTML with evidence in expandable detail. When I provide more information, issue a new revision and explain what changed.
+
+Try the separate v2.0 example: [HTML](examples/inventor-v2/report/disclosure.html), [Markdown](examples/inventor-v2/report/disclosure.md), [JSON](examples/inventor-v2/report/disclosure.json), or [editable analyzed input](examples/inventor-v2/analyzed-input.json). The founder input is fictional; the qualified public product references are real.
+
+```sh
+python3 skills/inventor-brief-v2/scripts/render_report.py examples/inventor-v2/analyzed-input.json /tmp/inventor-v2-report
+```
+
+The renderer displays supplied analysis; host tools perform reasoning, document reading, and research. Older version-1 JSON is supported, with an explicit message when no patent assessment was authored. The skill release version is 2.0; the compatible JSON envelope remains schema version 1.
+
 ## What founders receive
 
 | Section | What it answers |

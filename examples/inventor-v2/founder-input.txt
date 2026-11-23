@@ -1,0 +1,1 @@
+Fictional example: I want a home water controller that watches how long water flows without stopping. When I mark the home as away and water keeps flowing beyond a set time, it notifies me and closes a motorized main-water valve. I want to limit water damage while nobody is home. I have not built it, chosen the timer rule, or decided what happens if a sensor or the power fails.
