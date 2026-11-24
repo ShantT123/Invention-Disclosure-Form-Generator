@@ -1,0 +1,21 @@
+name: Local app checks
+on:
+  pull_request:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m unittest discover -s tests
+      - run: python -m pip install playwright==1.56.0
+      - run: python -m playwright install --with-deps chromium
+      - name: Locate Chromium for the browser harness
+        run: sudo ln -s "$(find "$HOME/.cache/ms-playwright" -type f -path '*/chrome-linux/chrome' -o -type f -path '*/chrome-linux64/chrome' | head -1)" /usr/bin/chromium
+      - run: python tests/browser_check_local.py

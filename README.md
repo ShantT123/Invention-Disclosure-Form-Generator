@@ -4,6 +4,20 @@ Turn an inventor or startup founder's description into a clear **invention discl
 
 The report helps founders explain what they are building, identify the technical ideas the AI sees, and prepare a more productive conversation with patent counsel. It is **not a prior-art search** and does not determine patentability, legal coverage, infringement, or freedom to operate.
 
+## New: local Chrome application prototype
+
+For the operator workflow—receive client text, enter it locally, review/update the brief, and give the client an HTML file—there is now a [local browser application](docs/local-app.md). It preserves both skills and uses the v2.0 renderer. Client projects and immutable assessment revisions are stored outside the repository; public research is off unless explicitly used.
+
+Source launch (Python 3.10+; official Ollama Mac app required):
+
+```sh
+python3 -m local_app
+```
+
+The interface handles runtime startup, local model downloads, descriptions, follow-up answers, report previews, and HTML/Markdown/JSON downloads. It has no cloud inference fallback. The initial prototype is for short English text, not PDFs or drawings. Optional research uses predefined generic queries and explicitly imported public URLs.
+
+A GitHub Actions workflow (PR build or manual run) and Mac build script prepare a downloadable `.app`/`.dmg` without the App Store. Mac packaging, signing/notarization, real-model quality, and 8 GB Mac performance still require Mac validation; this repository does not yet provide a tested/notarized installer. See [setup, privacy, limits, testing, and distribution](docs/local-app.md).
+
 ## Choose a skill
 
 | Skill | Audience and format | Install folder |
