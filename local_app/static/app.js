@@ -5,7 +5,22 @@ const supplied = fragment.get('session');
 if (supplied) sessionStorage.setItem('local-session', supplied);
 history.replaceState(null, '', location.pathname);
 const token = sessionStorage.getItem('local-session') || '';
-let current = null, job = null;
+let current = null, job = null, inputLimit = 200000;
+const bytes = text => new TextEncoder().encode(text).length;
+function updateInputMeters() {
+  const used = current ? current.inputs.reduce((n,x)=>n+bytes(x.text),0) : 0;
+  for (const [input,meter,existing] of [['description','description-size',0],['followup','followup-size',used]]) {
+    const total=bytes($(input).value)+existing;
+    $(meter).textContent=`${total.toLocaleString()} / ${inputLimit.toLocaleString()} UTF-8 bytes${total>inputLimit?' · Too large; shorten the text before saving.':total>6000?' · Long-text local processing will take additional time.':''}`;
+    $(meter).classList.toggle('over-limit',total>inputLimit);
+  }
+}
+function checkInput(text,existing=0) {
+  if(bytes(text)+existing>inputLimit)throw new Error(`Text exceeds the ${inputLimit.toLocaleString()}-byte project limit. Nothing was saved or truncated; your pasted text is still in the form.`);
+}
+$('description').addEventListener('input',updateInputMeters);
+$('followup').addEventListener('input',updateInputMeters);
+updateInputMeters();
 function message(text, error=false) { $('message').textContent=text; $('message').className=error?'error':''; }
 async function api(path, body) {
   const response=await fetch(path,{method:body===undefined?'GET':'POST',headers:{'X-Local-Token':token,'Content-Type':'application/json'},body:body===undefined?undefined:JSON.stringify(body)});
@@ -15,6 +30,7 @@ async function api(path, body) {
 function item(text, tag='p') {const el=document.createElement(tag);el.textContent=text;return el;}
 async function status() {
   const s=await api('/api/status');
+  inputLimit=s.input_limit_bytes;updateInputMeters();$('app-version').textContent='LOCAL PROTOTYPE '+s.app_version;
   $('runtime-status').textContent=!s.installed?'Install Ollama first, then start local AI.':!s.running?'Ready to start. No client data leaves this computer.':`Local-only AI running · ${s.models.length?'Downloaded: '+s.models.join(', '):'download a model to begin.'}`;
   const topic=$('research-topic').value;
   $('research-topic').replaceChildren(...s.topics.map(x=>{const option=item(x,'option');option.value=x;return option;}));
@@ -28,6 +44,7 @@ async function projects() {
 }
 async function openProject(id) {
   current=await api('/api/projects/'+id);
+  updateInputMeters();
   $('create-panel').hidden=true;$('project-panel').hidden=false;
   $('project-title').textContent=current.title;
   $('project-summary').textContent=`${current.inputs.length} input(s) · ${current.sources.length} public source(s) · ${current.revisions.length} saved revision(s)`;
@@ -55,9 +72,9 @@ $('start-runtime').onclick=()=>run(async()=>watch((await api('/api/runtime/start
 $('pull-model').onclick=()=>run(async()=>watch((await api('/api/runtime/pull',{model:$('model').value})).job_id));
 $('cancel-job').onclick=()=>run(()=>api('/api/jobs/cancel',{}));
 $('shutdown').onclick=()=>run(async()=>{await api('/api/shutdown',{});message('Local app stopped. You can close this tab.');});
-$('new-project').onclick=()=>{current=null;$('create-panel').hidden=false;$('project-panel').hidden=true;};
-$('create-form').onsubmit=e=>{e.preventDefault();run(async()=>{const p=await api('/api/projects',{title:$('title').value,description:$('description').value});$('create-form').reset();await projects();await openProject(p.id);message('Saved on this computer. Start local AI, download a model, then generate the brief.');});};
-$('followup-form').onsubmit=e=>{e.preventDefault();run(async()=>{await api('/api/projects/'+current.id+'/inputs',{text:$('followup').value});$('followup').value='';await openProject(current.id);message('Follow-up saved. Generate a new brief to update the assessment; earlier reports remain available.');});};
+$('new-project').onclick=()=>{current=null;updateInputMeters();$('create-panel').hidden=false;$('project-panel').hidden=true;};
+$('create-form').onsubmit=e=>{e.preventDefault();run(async()=>{checkInput($('description').value);const p=await api('/api/projects',{title:$('title').value,description:$('description').value});$('create-form').reset();await projects();await openProject(p.id);message('Saved on this computer. Start local AI, download a model, then generate the brief.');});};
+$('followup-form').onsubmit=e=>{e.preventDefault();run(async()=>{checkInput($('followup').value,current.inputs.reduce((n,x)=>n+bytes(x.text),0));await api('/api/projects/'+current.id+'/inputs',{text:$('followup').value});$('followup').value='';await openProject(current.id);message('Follow-up saved. Generate a new brief to update the assessment; earlier reports remain available.');});};
 $('generate').onclick=()=>run(async()=>watch((await api('/api/projects/'+current.id+'/generate',{model:$('model').value,expected_revision:current.revisions.length})).job_id));
 $('revision').onchange=showReport;
 function queryPreview() {$('query-preview').textContent='Exact outbound query: '+$('research-topic').value+' products research';}

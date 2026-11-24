@@ -14,7 +14,7 @@ Source launch (Python 3.10+; official Ollama Mac app required):
 python3 -m local_app
 ```
 
-The interface handles runtime startup, local model downloads, descriptions, follow-up answers, report previews, and HTML/Markdown/JSON downloads. It has no cloud inference fallback. The initial prototype is for short English text, not PDFs or drawings. Optional research uses predefined generic queries and explicitly imported public URLs.
+The interface handles runtime startup, local model downloads, descriptions, follow-up answers, report previews, and HTML/Markdown/JSON downloads. It has no cloud inference fallback. Version 0.1.1 accepts pasted English text up to 200,000 UTF-8 bytes per project, with visible counters and sequential local summarization for long specifications. The model context remains bounded; processing may take many minutes and summaries may omit details. PDFs and drawings are not supported. Optional research uses predefined generic queries and explicitly imported public URLs.
 
 A GitHub Actions workflow (PR build or manual run) and Mac build script prepare a downloadable `.app`/`.dmg` without the App Store. Mac packaging, signing/notarization, real-model quality, and 8 GB Mac performance still require Mac validation; this repository does not yet provide a tested/notarized installer. See [setup, privacy, limits, testing, and distribution](docs/local-app.md).
 

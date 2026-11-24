@@ -6,6 +6,7 @@ import sqlite3
 import sys
 import threading
 import uuid
+from .input_text import validate_input
 from datetime import datetime, timezone
 
 
@@ -41,6 +42,7 @@ class Store:
         os.chmod(self.directory / 'projects.sqlite3', 0o600)
 
     def create(self, title, description):
+        validate_input(description, minimum=20)
         pid = uuid.uuid4().hex
         with self.lock, self.db:
             self.db.execute('INSERT INTO projects VALUES(?,?,?)', (pid, title, now()))
@@ -66,8 +68,7 @@ class Store:
     def add_input(self, pid, text):
         with self.lock, self.db:
             p = self.get(pid)
-            if sum(len(x['text'].encode()) for x in p['inputs']) + len(text.encode()) > 6000:
-                raise ValueError('This 4K-context prototype supports 6,000 UTF-8 bytes of inventor input per project. Keep follow-up answers concise; nothing was truncated.')
+            validate_input(text, existing_bytes=sum(len(x['text'].encode()) for x in p['inputs']))
             self.db.execute('INSERT INTO inputs VALUES(?,?,?,?)', (uuid.uuid4().hex, pid, text, now()))
 
     def log_search(self, pid, query):
@@ -94,7 +95,7 @@ class Store:
             current = self.db.execute('SELECT count(*) FROM revisions WHERE project_id=?', (pid,)).fetchone()[0]
             if current != expected_number:
                 raise ValueError('Project revision changed; reload before generating again')
-            self.db.execute('INSERT INTO revisions VALUES(?,?,?,?,?,?)', (pid, current + 1, now(), json.dumps(report, ensure_ascii=False), model, 'local-pipeline-1'))
+            self.db.execute('INSERT INTO revisions VALUES(?,?,?,?,?,?)', (pid, current + 1, now(), json.dumps(report, ensure_ascii=False), model, report.get('generation', {}).get('prompt_version', 'local-pipeline-1')))
 
     def close(self):
         self.db.close()
