@@ -1,6 +1,8 @@
 """End-to-end application checks with explicitly synthetic model responses, not model-quality validation."""
 from pathlib import Path
 import json
+import os
+import shutil
 import sys
 import tempfile
 import threading
@@ -17,7 +19,7 @@ with tempfile.TemporaryDirectory() as directory:
  origin=f'http://127.0.0.1:{server.server_port}'
  try:
   with sync_playwright() as p:
-   browser=p.chromium.launch(executable_path='/usr/bin/chromium',headless=True,args=['--no-sandbox'])
+   browser=p.chromium.launch(executable_path=os.environ.get('INVENTION_TEST_BROWSER') or shutil.which('chromium') or shutil.which('google-chrome'),headless=True,args=['--no-sandbox'])
    page=browser.new_page(viewport={'width':1440,'height':1100})
    external=[];errors=[]
    page.on('request',lambda req:external.append(req.url) if not req.url.startswith(origin) else None)
