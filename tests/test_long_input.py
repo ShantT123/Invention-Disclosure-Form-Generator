@@ -17,16 +17,15 @@ class DigestRuntime(FakeRuntime):
  def __init__(self):super().__init__();self.documents=[];self.extract_prompt=None;self.corrupt=False;self.cancel_on_section=None
  def generate(self,model,prompt,schema,cancel):
   if schema is EXTRACT:self.extract_prompt=prompt
-  if schema is not DIGEST_SCHEMA:return super().generate(model,prompt,schema,cancel)
-  payload=json.loads(prompt.split('UNTRUSTED EVIDENCE DATA:\n',1)[1])
-  if isinstance(payload,dict):
-   self.documents.append(payload)
-   facts=[{'source_id':payload['source_id'],'quote':payload['text'][-120:],'meaning':'An inferred mechanism in this local section.'}]
+  if set(schema.get('properties',{})) != {'overview','facts','uncertainties'}:return super().generate(model,prompt,schema,cancel)
+  payload=json.JSONDecoder().raw_decode(prompt.split('UNTRUSTED EVIDENCE DATA:\n',1)[1])[0]
+  if 'section' in payload:
+   self.documents.append({**payload['section'],'text': ''.join(x['text'] for x in payload['excerpts'])})
    if self.cancel_on_section==len(self.documents):cancel.set()
-  else:
-   facts=[x for group in payload for x in group['facts']]
-   facts=[facts[0],facts[-1]] if len(facts)>1 else facts
-  if self.corrupt:facts[0]['quote']='This quotation is absent from the inventor input.'
+  available=[x for x in payload['excerpts'] if x['selectable']]
+  selected=available[-1:]
+  facts=[{'evidence_id':x['evidence_id'],'meaning':'An inferred mechanism in this local section.'} for x in selected]
+  if self.corrupt and facts:facts[0]['evidence_id']='E999'
   return {'overview':'Working local summary of a technical mechanism and its context. '*3,'facts':facts,'uncertainties':'Implementation details and any claim-specific interpretation require review.'}
 
 
@@ -63,10 +62,10 @@ class LongInputTests(unittest.TestCase):
    self.assertEqual(s.get(pid)['revisions'][0]['prompt_version'],d['generation']['prompt_version'])
    s.close()
 
- def test_unmatched_section_quote_aborts(self):
+ def test_unknown_excerpt_choice_aborts_after_bounded_retry(self):
   with tempfile.TemporaryDirectory() as folder:
    s=Store(folder);pid=s.create('Long','Fictional valve specification. '*800);runtime=DigestRuntime();runtime.corrupt=True
-   with self.assertRaisesRegex(ValueError,'quotation not found'):analyze(s.get(pid),runtime,'llama3.2:3b',threading.Event(),lambda x:None)
+   with self.assertRaisesRegex(ValueError,'Reading long text · section 1'):analyze(s.get(pid),runtime,'llama3.2:3b',threading.Event(),lambda x:None)
    self.assertEqual(s.get(pid)['revisions'],[]);s.close()
 
  def test_cancel_during_document_preparation_leaves_existing_revision(self):
