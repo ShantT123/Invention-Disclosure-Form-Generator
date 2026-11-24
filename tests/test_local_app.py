@@ -32,7 +32,7 @@ class StoreTests(unittest.TestCase):
   with self.assertRaisesRegex(ValueError,'outside'):Store(Path(__file__).resolve().parents[1]/'private-test-data')
   with tempfile.TemporaryDirectory() as folder:
    s=Store(folder);pid=s.create('Fictional',DESCRIPTION)
-   with self.assertRaisesRegex(ValueError,'nothing was truncated'):s.add_input(pid,'x'*6000)
+   with self.assertRaisesRegex(ValueError,'Nothing was saved or truncated'):s.add_input(pid,'x'*200000)
    self.assertEqual(len(s.get(pid)['inputs']),1);s.close()
 
 class PipelineTests(unittest.TestCase):

@@ -1,4 +1,4 @@
-# Local browser prototype · 0.1.0
+# Local browser prototype · 0.1.1
 
 The operator receives client information, enters it locally, reviews the AI interpretation, adds client answers, and downloads an HTML report to send separately. This does not email, host, file, or share a report automatically. Both existing skills are preserved.
 
@@ -11,7 +11,7 @@ The operator receives client information, enters it locally, reviews the AI inte
 - A single app-managed Ollama process, one job at a time, model download progress, cancellation, and errors that do not replace earlier reports.
 - Optional public research through a finite list of broad topic queries and explicitly imported public HTTPS pages. No automatic invention-based queries or autonomous model tool calls.
 
-This is a text-only English prototype. It accepts up to 6,000 UTF-8 bytes of inventor text across a project's inputs, three public pages, and bounded source excerpts. It does not silently truncate inventor inputs. PDFs, OCR, drawings, arbitrarily long histories, and multi-user access are not supported. Limits are explicit rather than pretending that an 8 GB machine can process unlimited context.
+This is a text-only English prototype. It accepts up to 200,000 UTF-8 bytes of inventor text across a project’s inputs, three public pages, and bounded source excerpts. The HTTP request limit is a separate 2 MB. Visible byte counters and specific errors explain these limits before submission. It does not silently truncate inventor inputs. PDFs, OCR, drawings, arbitrarily long histories, and multi-user access are not supported. The 4K inference context remains bounded: text over the direct-input budget is split losslessly into sections of at most 3,600 UTF-8 bytes. Each section is summarized locally, then summaries are consolidated in bounded pairs before the existing three analysis stages. Source quotations must match the original section or a previously verified quotation. The full original text and a section-summary ledger remain in the report JSON; the dashboard states processing coverage and the risk of omissions. Long specifications can take many minutes on a small model. Every section being submitted does not establish that every important detail was understood or retained. This does not turn the founder brief into a claim chart or a complete patent review.
 
 ## Run on your own machine
 
@@ -83,6 +83,13 @@ Mac packaging cannot be built or validated in the Linux development environment.
 ```sh
 python3 -m unittest discover -s tests
 python3 tests/browser_check_local.py /tmp/local-app-preview
+python3 tests/browser_check_long.py /tmp/long-input-preview
 ```
 
 The second command requires Playwright and Chromium for development only. It uses **explicitly synthetic runtime responses** to test real application routes, UI, rendering, downloads, follow-ups, and revision preservation. Unit tests check provenance, immutable storage, session/Origin/Host boundaries, unsupported sources, cancellation, and restricted fetching. They do not replace real-model or hardware evaluation.
+
+## Updating from 0.1.0 after a large-paste error
+
+The old “Expected a bounded JSON request” error combined an HTTP size check and content-type check, before the model was called. The old app also imposed a 6,000-byte project limit. Version 0.1.1 separates transport and saved-text limits, provides readable size/type errors, and adds local sequential preparation for longer text. Quit the old local app before opening the updated build. Existing SQLite projects, reports, and model downloads remain in the same data directory; do not delete it to update. Data saved by the new build is backward-readable as SQLite, but the older app will still reject generating from long projects. Failed submissions keep the pasted form text; failed/cancelled generations keep earlier reports.
+
+The long-text path is tested with synthetic inference responses, including original-text preservation, end-of-document coverage, UTF-8 section boundaries, summary quotation validation, reduction, and cancellation. Real local-model summary quality and runtime on an 8 GB Mac are not benchmarked. Review the full specification and actual claims before relying on the resulting brief.

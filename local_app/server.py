@@ -12,10 +12,18 @@ import webbrowser
 from urllib.parse import urlsplit, parse_qs, quote
 from pathlib import Path
 
+from . import __version__
+from .input_text import MAX_INPUT_BYTES, MAX_REQUEST_BYTES, validate_input
 from .storage import Store
 from .runtime import Runtime, MODELS
 from .pipeline import analyze, renderer, ROOT
 from .research import fetch_public, TOPICS
+
+
+class RequestError(ValueError):
+    def __init__(self, status, message):
+        super().__init__(message)
+        self.status = status
 
 
 class App:
@@ -93,9 +101,17 @@ def make_server(app, port=0):
             return bool(token) and hmac.compare_digest(token, app.token)
 
         def body(self):
-            length = int(self.headers.get('Content-Length', '0'))
-            if not 0 < length <= 20000 or self.headers.get('Content-Type', '').split(';')[0] != 'application/json':
-                raise ValueError('Expected a bounded JSON request')
+            try:
+                length = int(self.headers.get('Content-Length', '0'))
+            except ValueError:
+                raise RequestError(400, 'Invalid request length; your text was not saved')
+            if self.headers.get('Content-Type', '').split(';')[0] != 'application/json':
+                raise RequestError(415, 'This local endpoint requires JSON; reload the application and retry')
+            if length > MAX_REQUEST_BYTES:
+                self.close_connection = True
+                raise RequestError(413, f'The pasted request is too large (limit {MAX_REQUEST_BYTES:,} bytes). The project text limit is {MAX_INPUT_BYTES:,} UTF-8 bytes. Nothing was saved or sent to the model.')
+            if length <= 0:
+                raise RequestError(400, 'The request was empty; your text was not saved')
             value = json.loads(self.rfile.read(length))
             if not isinstance(value, dict): raise ValueError('Expected an object')
             return value
@@ -112,7 +128,7 @@ def make_server(app, port=0):
             try:
                 parts = path.strip('/').split('/')
                 if path == '/api/status':
-                    return self.send(200, dict(app.runtime.status(), active_job=app.active, topics=list(TOPICS), data_directory=str(app.store.directory)), cookie=True)
+                    return self.send(200, dict(app.runtime.status(), active_job=app.active, topics=list(TOPICS), data_directory=str(app.store.directory), input_limit_bytes=MAX_INPUT_BYTES, app_version=__version__), cookie=True)
                 if path == '/api/projects': return self.send(200, app.store.list())
                 if len(parts) == 3 and parts[:2] == ['api', 'projects']:
                     return self.send(200, app.store.get(parts[2]))
@@ -161,8 +177,8 @@ def make_server(app, port=0):
                 if path == '/api/projects':
                     title, description = data.get('title', ''), data.get('description', '')
                     if not isinstance(title, str) or not 1 <= len(title.strip()) <= 120: raise ValueError('Enter a project title (up to 120 characters)')
-                    if not isinstance(description, str) or not 20 <= len(description.strip()) or len(description.encode()) > 6000: raise ValueError('Enter a description of at least 20 characters and at most 6,000 UTF-8 bytes')
-                    return self.send(201, {'id': app.store.create(title.strip(), description.strip())})
+                    validate_input(description, minimum=20)
+                    return self.send(201, {'id': app.store.create(title.strip(), description)})
                 parts = path.strip('/').split('/')
                 if len(parts) == 4 and parts[:2] == ['api', 'projects']:
                     pid, action = parts[2:]
@@ -171,8 +187,8 @@ def make_server(app, port=0):
                         project = app.store.get(pid)
                         if action == 'inputs':
                             text = data.get('text', '')
-                            if not isinstance(text, str) or not 3 <= len(text.strip()) or len(text.encode()) > 6000: raise ValueError('Enter a concise follow-up answer')
-                            app.store.add_input(pid, text.strip()); return self.send(200, {'ok': True})
+                            validate_input(text)
+                            app.store.add_input(pid, text); return self.send(200, {'ok': True})
                         if action == 'search':
                             topic = data.get('topic')
                             if topic not in TOPICS: raise ValueError('Choose a predefined public topic; private search text is not accepted')
@@ -197,6 +213,7 @@ def make_server(app, port=0):
                                     app.store.commit(pid, len(project['revisions']), report, model)
                             return self.send(202, {'job_id': app.job('analysis', generate)})
                 return self.send(404, {'error': 'Not found'})
+            except RequestError as exc: return self.send(exc.status, {'error': str(exc)})
             except (ValueError, json.JSONDecodeError) as exc: return self.send(400, {'error': str(exc)[:350]})
             except KeyError: return self.send(404, {'error': 'Project not found'})
             except Exception: return self.send(500, {'error': 'Local operation failed; no report was replaced'})

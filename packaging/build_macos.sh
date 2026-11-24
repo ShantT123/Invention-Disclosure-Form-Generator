@@ -27,7 +27,8 @@ python3 -c "import shutil; shutil.rmtree('build/dmg-content', ignore_errors=True
 mkdir -p build/dmg-content
 cp -R "$APP" build/dmg-content/
 ln -sfn /Applications build/dmg-content/Applications
-DMG="dist/Invention-Disclosure-Generator-arm64.dmg"
+APP_VERSION="$(python3 -c 'from local_app import __version__; print(__version__)')"
+DMG="dist/Invention-Disclosure-Generator-${APP_VERSION}-arm64.dmg"
 hdiutil create -volname "Invention Disclosure Generator" -srcfolder build/dmg-content -ov -format UDZO "$DMG"
 if [[ -n "${MAC_NOTARY_PROFILE:-}" ]]; then
   if [[ -z "${MAC_SIGN_IDENTITY:-}" ]]; then echo "Notarization requires Developer ID signing."; exit 1; fi
