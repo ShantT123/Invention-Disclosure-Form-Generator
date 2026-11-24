@@ -1,4 +1,4 @@
-# Local browser prototype · 0.1.2
+# Local browser prototype · 0.1.3
 
 The operator receives client information, enters it locally, reviews the AI interpretation, adds client answers, and downloads an HTML report to send separately. This does not email, host, file, or share a report automatically. Both existing skills are preserved.
 
@@ -43,7 +43,7 @@ The app can open a query composed only from one predefined broad topic and “pr
 
 To add evidence, select a public page yourself and approve its exact URL. Only that URL is sent, without cookies, credentials, referer, or inventor data. The fetcher accepts HTTPS on port 443, rejects query strings/private IPs/reserved destinations, validates each redirect, and pins the validated destination while checking the TLS hostname. It limits response size and extracts text without running page scripts. Some legitimate pages will be rejected or unreadable. Do not use private document-sharing URLs.
 
-Only a bounded excerpt is passed to the local model. Product/company identities must appear in the imported title/excerpt, and a supporting quotation must match the retrieved excerpt exactly. The app records the actual access date and content hash. This prevents invented references from becoming sources; it does **not** prove the model's interpretation of a quotation. Unsupported candidates fail the generation rather than being presented as verified. Review comparisons before sharing.
+Only a bounded excerpt is passed to the local model. Product/company identities must appear in the imported title/excerpt, and a supporting quotation must match the retrieved excerpt exactly. The app records the actual access date and content hash. This prevents invented references from becoming sources; it does **not** prove the model's interpretation of a quotation. Unsupported candidates trigger one bounded repair attempt; if they remain unsupported, generation fails rather than presenting them as verified. With no imported sources, all model-suggested public comparisons are discarded, an explicit gap remains, and the rest of the brief can proceed. Review comparisons before sharing.
 
 Model-memory products are not permitted in the landscape. With no public sources, it remains empty with an explicit research gap; generic related concepts may be presented as AI hypotheses. Imported but unused pages are not marked inspected. There is no prior-art search or legal status verification.
 
@@ -95,3 +95,5 @@ The old “Expected a bounded JSON request” error combined an HTTP size check 
 The long-text path is tested with synthetic inference responses, including original-text preservation, end-of-document coverage, UTF-8 section boundaries, literal excerpt binding, unknown-ID rejection, structured-response recovery, reduction, and cancellation. Real local-model summary quality and runtime on an 8 GB Mac are not benchmarked. Review the full specification and actual claims before relying on the resulting brief.
 
 Version 0.1.2 fixes the long-document failure “A document summary included a quotation not found in its input section.” Earlier builds asked the model to copy quotations and long source IDs exactly; the new excerpt-selection path removes that copying step rather than accepting fuzzy matches. A malformed structured response gets one bounded retry, followed by a stage-specific error if it still fails. Public product-source quotation checks remain unchanged. Quit the old app and replace it with the updated build; existing saved inputs, models, and report revisions remain in place. Regenerate the failed report. No database migration is required.
+
+Version 0.1.3 fixes “Model invented a public source.” Comparison schemas now use the actual concept and public-source counts. With public research off, model-memory product suggestions are removed before assessment and export, and the report records that omission. With imported sources, both source indexes and literal supporting evidence are checked within the bounded retry. It does not treat an empty product list as evidence of novelty. Existing projects, models, and assessment history remain compatible.

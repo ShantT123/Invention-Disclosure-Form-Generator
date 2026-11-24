@@ -18,5 +18,5 @@ class FakeRuntime:
         self.calls.append((prompt,schema))
         if self.fail:raise RuntimeError('Synthetic test failure')
         if schema is EXTRACT:return copy.deepcopy(EXTRACTION)
-        if schema is COMPARE:return {'related':[{'name':'Flow monitoring','concept_index':0,'shared':'Both observe flow before responding.','differences':'Actual differences are unknown.','question':'What specific rule distinguishes this design?'}],'landscape':[]}
+        if set(schema.get('properties', {})) == {'related', 'landscape'}:return {'related':[{'name':'Flow monitoring','concept_index':0,'shared':'Both observe flow before responding.','differences':'Actual differences are unknown.','question':'What specific rule distinguishes this design?'}],'landscape':[]}
         return copy.deepcopy(ASSESSMENT)
