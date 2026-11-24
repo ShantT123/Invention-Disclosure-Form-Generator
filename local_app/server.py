@@ -4,6 +4,8 @@ import hmac
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import json
 import secrets
+import subprocess
+import sys
 import threading
 import uuid
 import webbrowser
@@ -205,6 +207,17 @@ def make_server(app, port=0):
     return server
 
 
+def open_interface(url):
+    if sys.platform == 'darwin':
+        try:
+            subprocess.run(['open', '-a', 'Google Chrome', url], check=True, timeout=10,
+                           stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            return
+        except (OSError, subprocess.SubprocessError):
+            pass
+    webbrowser.open(url)
+
+
 def main():
     parser = argparse.ArgumentParser(description='Start the local Invention Disclosure browser app')
     parser.add_argument('--data-dir', type=Path)
@@ -223,10 +236,7 @@ def main():
     if args.no_browser:
         print('Local development session (keep private): ' + url, flush=True)
     else:
-        try:
-            webbrowser.get('chrome' if __import__('sys').platform == 'darwin' else None).open(url)
-        except webbrowser.Error:
-            webbrowser.open(url)
+        open_interface(url)
     try:
         server.serve_forever()
     except KeyboardInterrupt:

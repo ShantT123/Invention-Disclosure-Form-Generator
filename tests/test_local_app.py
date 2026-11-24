@@ -8,7 +8,7 @@ import unittest
 from unittest.mock import patch, MagicMock
 
 from local_app.storage import Store
-from local_app.server import App, make_server
+from local_app.server import App, make_server, open_interface
 from local_app.pipeline import analyze, assemble
 from local_app.research import destination, fetch_public, PinnedHTTPS
 from local_app.runtime import Runtime
@@ -171,3 +171,12 @@ class RuntimeTests(unittest.TestCase):
    with patch('local_app.runtime.http.client.HTTPConnection') as connection:
     with self.assertRaisesRegex(RuntimeError,'Cloud models'):runtime.generate('llama3.2:3b','Synthetic',{},threading.Event())
     connection.assert_not_called()
+
+
+class LauncherTests(unittest.TestCase):
+ def test_mac_launch_explicitly_selects_chrome_without_shell(self):
+  with patch('local_app.server.sys.platform','darwin'),patch('local_app.server.subprocess.run') as run,patch('local_app.server.webbrowser.open') as fallback:
+   open_interface('http://127.0.0.1:12345/#session=synthetic')
+   self.assertEqual(run.call_args.args[0][:3],['open','-a','Google Chrome'])
+   self.assertNotIn('shell',run.call_args.kwargs)
+   fallback.assert_not_called()

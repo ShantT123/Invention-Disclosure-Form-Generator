@@ -23,6 +23,7 @@ fi
 find "$APP" -path '*skills/inventor-brief-v2/scripts/render_report.py' | head -1 | grep -q .
 find "$APP" -path '*local_app/static/index.html' | head -1 | grep -q .
 "$APP/Contents/MacOS/Invention Disclosure Generator" --self-check
+python3 -c "import shutil; shutil.rmtree('build/dmg-content', ignore_errors=True)"
 mkdir -p build/dmg-content
 cp -R "$APP" build/dmg-content/
 ln -sfn /Applications build/dmg-content/Applications
